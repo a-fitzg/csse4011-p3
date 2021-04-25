@@ -71,6 +71,6 @@ void main(void) {
     }
     dist = (((double) pulseTime) / US_CONVERT);
     printf("%lf\r\n", dist);
-    k_msleep(100);
+    k_msleep(30);
   }
 }

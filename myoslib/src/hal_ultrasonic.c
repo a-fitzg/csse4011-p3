@@ -52,7 +52,7 @@ void hal_ultrasonic_init() {
     gpio_config(ech, ECHO_PIN, GPIO_INPUT);
 }
 
-double hal_ultrasonic_read() {
+uint16_t hal_ultrasonic_read() {
     uint16_t pulseTime;
     double dist;
 
@@ -67,6 +67,7 @@ double hal_ultrasonic_read() {
       pulseTime++;
       k_usleep(1);
     }
-    dist = (((double) pulseTime) / US_CONVERT);
-    return dist;
+
+    // dist = (((double) pulseTime) / US_CONVERT);
+    return pulseTime;
 }

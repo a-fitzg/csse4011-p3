@@ -44,10 +44,21 @@ struct Packetback {
     uint8_t d6;
 };
 
+struct UsPacket {
+    uint8_t preamb;
+    uint8_t type;
+    uint8_t length;
+    uint8_t sid;
+    uint8_t data[2];
+};
+
 extern void hal_parse_to_spi(uint8_t sid, size_t argc, char** argv, uint8_t device);
 extern struct Packet hal_parse_from_spi(uint8_t *msg);
 extern void hal_slave_to_master(uint8_t mode, uint8_t* data);
 extern struct Packetback hal_master_from_slave(uint8_t *msg);
 extern void hal_lsmx_slave_to_master(uint8_t mode, uint8_t* data);
+
+extern void hal_parse_spi(uint8_t sid, uint16_t data, uint8_t type);
+extern struct UsPacket hal_unparse_spi(uint8_t *msg);
 
 #endif
