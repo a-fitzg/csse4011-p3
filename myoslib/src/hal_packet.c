@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <shell/shell_uart.h>
-#include <lsm6dsl/lsm6dsl.h>
 #include <shell/shell.h>
 #include "hal_packet.h"
 #include "os_i2c.h"
@@ -141,5 +140,41 @@ struct Packetback hal_master_from_slave(uint8_t *msg) {
     data_back.d6 = msg[9];
 
     return data_back;
+}
+
+void hal_parse_spi(uint8_t sid, uint16_t data, uint8_t type) {
+    
+    uint8_t msg[SPI_BUFFER];
+    if (sid == 6) {
+        msg[0] = 0xAA; // spi preamb
+        msg[2] = 3; // sid and data size
+        msg[3] = 6;
+        if (type == 2) {
+            msg[1] = 2;
+            msg[4] = data >> 8;// upper 8 bit data
+            msg[5] = data & 0xFF; // lower 8 bit data
+        } else {
+            msg[1] = 1;
+        }
+    }
+    
+    hal_hci_transmit(msg);
+
+}
+
+
+struct UsPacket hal_unparse_spi(uint8_t *msg) {
+    struct UsPacket packet;
+
+    if (msg[0] == 0xAA) { // SPI preamb
+        packet.preamb = msg[0];
+        packet.type = msg[1];
+        packet.length = msg[2];
+        packet.sid = msg[3];
+        packet.data[0] = msg[4];
+        packet.data[1] = msg[5];
+    }
+
+    return packet;
 }
 

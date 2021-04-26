@@ -9,6 +9,7 @@
 #include <sys_clock.h>
 #include <sys/util.h>
 #include <limits.h>
+#include "hal_ultrasonic.h"
 
 #define     US_CONVERT  35
 #define     TIMEOUT     50000
@@ -42,21 +43,18 @@
 const struct device *trig;
 const struct device *ech;
 
-void main(void) {
-  trig = device_get_binding(TRIGGER);
-  ech = device_get_binding(ECHO);
-  // uint32_t cycles_spent;
-  // uint32_t nanseconds_spent;
-  // uint32_t stop;
-  // uint32_t start;
-  double dist;
-  gpio_config(trig, TRIGGER_PIN, GPIO_OUTPUT_ACTIVE);
-  gpio_config(ech, ECHO_PIN, GPIO_INPUT);
-  uint16_t pulseTime;
-  gpio_pin_set(trig, TRIGGER_PIN, 0);
-  k_usleep(5);
 
-  while (1) {
+void hal_ultrasonic_init() {
+    trig = device_get_binding(TRIGGER);
+    ech = device_get_binding(ECHO);
+
+    gpio_config(trig, TRIGGER_PIN, GPIO_OUTPUT_ACTIVE);
+    gpio_config(ech, ECHO_PIN, GPIO_INPUT);
+}
+
+uint16_t hal_ultrasonic_read() {
+    uint16_t pulseTime;
+    double dist;
 
     gpio_pin_set(trig, TRIGGER_PIN, 1);
     k_usleep(10);
@@ -69,8 +67,7 @@ void main(void) {
       pulseTime++;
       k_usleep(1);
     }
-    dist = (((double) pulseTime) / US_CONVERT);
-    printf("%lf\r\n", dist);
-    k_msleep(30);
-  }
+
+    // dist = (((double) pulseTime) / US_CONVERT);
+    return pulseTime;
 }
