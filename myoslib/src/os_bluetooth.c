@@ -36,6 +36,7 @@ static const struct bt_data staticAdData[] = {
             0x00, 0x00)     // These have to be 0x00
 }; 
 
+/*
 static const struct bt_data mobileAdData[] = {
 
     BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
@@ -49,6 +50,7 @@ static const struct bt_data mobileAdData[] = {
             0x00, 0x00)     // These have to be 0x00
 
 };
+*/
 
 const struct bt_data staticResponseData[] = {
     BT_DATA(BT_DATA_NAME_COMPLETE, DEVICE_NAME, DEVICE_NAME_LEN),
@@ -254,7 +256,7 @@ void os_bluetooth_staticBeaconInit(int err) {
 }
 
 
-void os_bluetooth_MobileBeaconInit(int err) {
+void os_bluetooth_mobileBeaconInit(int err) {
 
     char addr_s[BT_ADDR_LE_STR_LEN];
     bt_addr_le_t addr = {0};

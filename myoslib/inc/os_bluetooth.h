@@ -48,7 +48,8 @@ extern struct k_mutex os_MutexNodeList;
 
 uint8_t addressesEqual(bt_addr_t, bt_addr_t);
 void scan_cb(const bt_addr_le_t*, int8_t, uint8_t, struct net_buf_simple*);
-void bt_beacon_init(int);
+void os_bluetooth_staticBeaconInit(int);
+void os_bluetooth_mobileBeaconInit(int);
 uint8_t os_bluetoothMobileListen(void*);
 
 #endif // BLUETOOTH_H
