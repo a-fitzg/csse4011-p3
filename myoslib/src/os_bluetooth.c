@@ -313,16 +313,8 @@ uint8_t os_bluetoothMobileListen(void* args) {
                 // ultrasonic ranging information
                 if (nodeList[i].node.hasUltrasonic) {
 
-                    // Convert byte array into double
-                    union {
-                        unsigned char bytes[sizeof(double)];
-                        double        us;
-                    } usConverter;
-                    
-                    // Copy first 8 bytes from payload into conversion union
-                    memcpy(&usConverter.bytes, &payload, sizeof(double));
-
-                    nodeList[i].node.ultrasonic = usConverter.us;
+                    nodeList[i].node.ultrasonic[0] = payload[0];
+                    nodeList[i].node.ultrasonic[1] = payload[1];
 
                     break;
                 }

@@ -28,7 +28,7 @@ typedef struct {
     bt_addr_t   address;
     uint8_t     hasUltrasonic;
     int8_t      rssi;
-    double      ultrasonic;
+    uint8_t     ultrasonic[2];
 } StaticNode;
 
 typedef struct {
