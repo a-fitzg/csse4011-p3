@@ -24,6 +24,7 @@
                                                 BT_GAP_ADV_FAST_INT_MAX_1, \
                                                 NULL)
 
+// Properties of a static node
 typedef struct {
     bt_addr_t   address;
     uint8_t     hasUltrasonic;
@@ -31,23 +32,33 @@ typedef struct {
     uint8_t     ultrasonic[2];
 } StaticNode;
 
+// Static node list item, each with an index and node properties
 typedef struct {
     uint8_t     index;
     StaticNode  node;
 } NodeListItem;
 
+// Items on the node message queue
 typedef struct {
     uint8_t     index;
     int8_t      rssi;
     uint8_t     payload[PAYLOAD_SIZE];
 } NodeQueueItem;
 
-extern NodeListItem nodeList[NUM_STATIC_NODES];
-extern struct k_msgq os_QueueBtNodeMessage;
+// Mutex for accessing list of node properties
 extern struct k_mutex os_MutexNodeList;
 
+// List of nodes and their properties
+// ##### MUST USE MUTEX (os_MutexNodeList) TO ACCESS THIS LIST #####
+extern NodeListItem nodeList[NUM_STATIC_NODES];
+
+// Message queue for incoming bluetooth messages (from static nodes)
+extern struct k_msgq os_QueueBtNodeMessage;
+
+// Function prototypes - more detailed top comments in source file
 uint8_t addressesEqual(bt_addr_t, bt_addr_t);
-void scan_cb(const bt_addr_le_t*, int8_t, uint8_t, struct net_buf_simple*);
+void bt_mobileCallback(const bt_addr_le_t*, int8_t, uint8_t,
+        struct net_buf_simple*);
 void os_bluetooth_staticBeaconInit(int);
 void os_bluetooth_mobileBeaconInit(int);
 uint8_t os_bluetoothMobileListen(void*);

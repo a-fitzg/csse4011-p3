@@ -1,9 +1,14 @@
-/* main.c - Application main entry point */
-
-/*
- * Copyright (c) 2015-2016 Intel Corporation
+/**
+ ******************************************************************************
+ * @file    apps/p3/mobile
+ * @author  Alexander FitzGerald - 45330874
+ * @date    27042020
+ * @brief   Mobile node source code for prac 3
+ ******************************************************************************
+ * EXTERNAL FUNCTIONS
+ ******************************************************************************
  *
- * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************
  */
 
 #include <zephyr.h>
@@ -47,7 +52,8 @@ static const struct bt_data mobileResponseData[] = {
 
 void main(void) {
 
-	struct bt_le_scan_param scan_param = {
+    // Scan parameters
+	struct bt_le_scan_param scanParams = {
 		.type       = BT_HCI_LE_SCAN_PASSIVE,
 		.options    = BT_LE_SCAN_OPT_NONE,
 		.interval   = 0x0005,
@@ -56,11 +62,13 @@ void main(void) {
 	int err;
     int btErr;
 
+#ifdef USB_DEBUG
     device_get_binding(CONFIG_UART_CONSOLE_ON_DEV_NAME);
 
     if (usb_enable(NULL)) {
         return;
     }
+#endif  // USB_DEBUG
 
     // Initialise node list mutex
     k_mutex_init(&os_MutexNodeList);
@@ -86,8 +94,6 @@ void main(void) {
 
     k_sleep(K_MSEC(10000));
 
-	//printk("Starting Scanner/Advertiser Demo\n");
-
 	// Initialize the Bluetooth Subsystem
 	err = bt_enable(NULL);
 	if (err) {
@@ -97,13 +103,13 @@ void main(void) {
 
 	printk("Bluetooth initialized\n");
 
-	err = bt_le_scan_start(&scan_param, scan_cb);
+	err = bt_le_scan_start(&scanParams, bt_mobileCallback);
 	if (err) {
 		printk("Starting scanning failed (err %d)\n", err);
 		return;
 	}
 
-    // We have started scanning, now 
+    // We have started scanning, now send off static node values every ~30ms
     while (1) {
 
         // RSSI values
@@ -111,15 +117,12 @@ void main(void) {
         // Ultrasonic values
         uint8_t us0[2];
         uint8_t us1[2];
-        // Timestamp
-        // Sensor values
 
         // Now get the values
         // Accessing variable shared across multiple threads, need to ensure
         // only 1 thread access the variables at once
         k_mutex_lock(&os_MutexNodeList, K_FOREVER);
 
-        // TODO - GET VALUES
         rssi0 = nodeList[0].node.rssi;
         rssi1 = nodeList[1].node.rssi;
         rssi2 = nodeList[2].node.rssi;
@@ -131,10 +134,13 @@ void main(void) {
         us1[0] = nodeList[1].node.ultrasonic[0];
         us1[1] = nodeList[1].node.ultrasonic[1];
 
+        // Get current uptime
         uint32_t uptime = (uint32_t)k_uptime_get();
 
+        // Leaving critical section
         k_mutex_unlock(&os_MutexNodeList);
 
+        // Union to convert time into individual bytes (to send over bluetooth)
         union {
             uint32_t        time;
             unsigned char   bytes[4];
@@ -142,6 +148,7 @@ void main(void) {
         
         timeConverter.time = uptime;
 
+        // Now we have the necessary values, send them off to the base node
         btErr = bt_le_adv_stop();
 
         const struct bt_data tempAd[] = {
@@ -159,12 +166,12 @@ void main(void) {
                         0x00, 0x00)
         };
 
-        // /*
+#ifdef DEBUG_PRINT
         printk("RSSI:  [%04d] [%04d] [%04d] [%04d]  ###   ", rssi0, rssi1, rssi2, rssi3);
         printk("US  :  [%04d | %04d] [%04d | %04d]  ###   ", us0[0], us0[1], us1[0], us1[1]);
         printk("TIME:  [%04d] [%04d] [%04d] [%04d]  \n", timeConverter.bytes[0], timeConverter.bytes[1], 
                 timeConverter.bytes[2], timeConverter.bytes[3]);
-        // */
+#endif  // DEBUG_PRINT
 
         err = bt_le_adv_start(BT_LE_FASTER_ADV, tempAd, ARRAY_SIZE(tempAd), mobileResponseData, ARRAY_SIZE(mobileResponseData));
 
@@ -172,3 +179,4 @@ void main(void) {
 
     }
 }
+

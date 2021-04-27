@@ -2,10 +2,6 @@
 
 cmake_minimum_required(VERSION 3.13.1)
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
-project(beacon)
-
-target_sources(app PRIVATE src/main.c)
-
-# Myoslib sources
+project(usonic)
 include_directories(../../../myoslib/inc)
-target_sources(app PRIVATE ../../../myoslib/src/os_bluetooth.c)
+target_sources(app PRIVATE src/main.c ../../../myoslib/src/hal_hci.c ../../../myoslib/src/hal_ultrasonic.c ../../../myoslib/src/hal_packet)

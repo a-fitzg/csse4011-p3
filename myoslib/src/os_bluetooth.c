@@ -23,6 +23,8 @@
 
 #include <os_bluetooth.h>
 
+// Initial advertising data for static nodes (overriden as soon as static node
+// enters cyclic executive)
 static const struct bt_data staticAdData[] = {
 
     BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
@@ -36,27 +38,17 @@ static const struct bt_data staticAdData[] = {
             0x00, 0x00)     // These have to be 0x00
 }; 
 
-/*
-static const struct bt_data mobileAdData[] = {
-
-    BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
-    BT_DATA_BYTES(BT_DATA_UUID16_ALL, 0xAA, 0xFE),
-    BT_DATA_BYTES(BT_DATA_SVC_DATA16,
-            0xAA, 0xFE,     // Eddystone UUID
-            0x00,           // Eddystone UID frame type
-            0x00,           // Calibrated Tx power at 0m
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00)     // These have to be 0x00
-
-};
-*/
-
+// Advertising response data for static nodes
 const struct bt_data staticResponseData[] = {
     BT_DATA(BT_DATA_NAME_COMPLETE, DEVICE_NAME, DEVICE_NAME_LEN),
 };
 
-
+/**
+ * @brief       Check if two bluetooth addresses are equal
+ * @param       address1: First address
+ * @param       address2: Second address
+ * @retval      true if addresses are equal, false if not equal
+ */
 uint8_t addressesEqual(bt_addr_t address1, bt_addr_t address2) {
 
     // Iterate through all address fields and see if they are equal
@@ -65,6 +57,7 @@ uint8_t addressesEqual(bt_addr_t address1, bt_addr_t address2) {
 
         if (address1.val[i] != address2.val[i]) {
 
+            // Found non-matching field
             return false;
         }
     }
@@ -73,72 +66,16 @@ uint8_t addressesEqual(bt_addr_t address1, bt_addr_t address2) {
 
 }
 
-
-void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
+/**
+ * @brief       Callback function for mobile node scan
+ * @param       addr:       Address of scan response
+ * @param       rssi:       RSSI strength of response
+ * @param       adv_type:   Response message type
+ * @param       buf:        Data buffer of message
+ */
+void bt_mobileBallback(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
 		    struct net_buf_simple *buf) {
     
-    /*
-    if (rssi > -40) {
-    printk("Found device [type: %d,  addr: %02x:%02x:%02x:%02x:%02x:%02x,  RSSI: %d,  len: %d,  DAT: %02x, %02x]\n", addr->type, 
-            addr->a.val[0], 
-            addr->a.val[1],
-            addr->a.val[2],
-            addr->a.val[3],
-            addr->a.val[4],
-            addr->a.val[5],
-            rssi, buf->len,
-            buf->data[13], buf->data[14]);
-    }
-    */
-    
-    
-    
-    /*
-    if (addr->a.val[0] == 0xD2 && 
-        addr->a.val[1] == 0x3D &&
-        addr->a.val[2] == 0x4E &&
-        addr->a.val[3] == 0x14 &&
-        addr->a.val[4] == 0x23 &&
-        addr->a.val[5] == 0xD9) {
-
-        // This is our beacon
-        LOG_INF("Beacon A ---");
-        //printk("--- BEACON A\n");
-        
-        printk("Found beacon A [RSSI: %d] DAT:[", rssi);
-        for (uint8_t i = 0; i < buf->len; i++) {
-            printk("%02x", buf->data[i]);
-            if (i < (buf->len) - 1) {
-                printk("|");
-            }
-        }
-        printk("]\n");
-        
-    }
-    
-    if (addr->a.val[0] == 0xAF && 
-        addr->a.val[1] == 0xDE &&
-        addr->a.val[2] == 0xCD &&
-        addr->a.val[3] == 0xD4 &&
-        addr->a.val[4] == 0x38 &&
-        addr->a.val[5] == 0xE1) {
-
-        // This is our beacon
-        LOG_WRN("--- Beacon B");
-        //printk("BEACON B ---\n");
-        
-        printk("######## Found beacon B [RSSI: %d] DAT:[", rssi);
-        for (uint8_t i = 0; i < buf->len; i++) {
-            printk("%02x", buf->data[i]);
-            if (i < (buf->len) - 1) {
-                printk("|");
-            }
-        }
-        printk("]\n");
-        
-    }
-    */
-
     // Listen for messages from node 1
     if (addressesEqual(addr->a, nodeList[0].node.address)) {
 
@@ -156,7 +93,8 @@ void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
         memcpy(&nodeQueueItem.payload, &payload, sizeof(payload));
 
         // Send off message to listening thread
-        while (k_msgq_put(&os_QueueBtNodeMessage, &nodeQueueItem, K_NO_WAIT) != 0) {
+        while (k_msgq_put(&os_QueueBtNodeMessage, &nodeQueueItem, K_NO_WAIT) 
+                != 0) {
 
             k_msgq_purge(&os_QueueBtNodeMessage);
         }
@@ -179,7 +117,8 @@ void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
         memcpy(&nodeQueueItem.payload, &payload, sizeof(payload));
 
         // Send off message to listening thread
-        while (k_msgq_put(&os_QueueBtNodeMessage, &nodeQueueItem, K_NO_WAIT) != 0) {
+        while (k_msgq_put(&os_QueueBtNodeMessage, &nodeQueueItem, K_NO_WAIT) 
+                != 0) {
 
             k_msgq_purge(&os_QueueBtNodeMessage);
         }
@@ -202,7 +141,8 @@ void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
         memcpy(&nodeQueueItem.payload, &payload, sizeof(payload));
 
         // Send off message to listening thread
-        while (k_msgq_put(&os_QueueBtNodeMessage, &nodeQueueItem, K_NO_WAIT) != 0) {
+        while (k_msgq_put(&os_QueueBtNodeMessage, &nodeQueueItem, K_NO_WAIT) 
+                != 0) {
 
             k_msgq_purge(&os_QueueBtNodeMessage);
         }
@@ -225,14 +165,18 @@ void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
         memcpy(&nodeQueueItem.payload, &payload, sizeof(payload));
 
         // Send off message to listening thread
-        while (k_msgq_put(&os_QueueBtNodeMessage, &nodeQueueItem, K_NO_WAIT) != 0) {
+        while (k_msgq_put(&os_QueueBtNodeMessage, &nodeQueueItem, K_NO_WAIT) 
+                != 0) {
 
             k_msgq_purge(&os_QueueBtNodeMessage);
         }
     }
 }
 
-
+/**
+ * @brief   Initialisation function for static beacon bluetooth advertising
+ * @param   err:    Error value - from calling function
+ */
 void os_bluetooth_staticBeaconInit(int err) {
 
     char addr_s[BT_ADDR_LE_STR_LEN];
@@ -247,8 +191,10 @@ void os_bluetooth_staticBeaconInit(int err) {
     printk("Bluetooth initialized\n");
 
     // Start advertising
-    err = bt_le_adv_start(BT_LE_FASTER_ADV, staticAdData, ARRAY_SIZE(staticAdData),
-                  staticResponseData, ARRAY_SIZE(staticResponseData));
+    err = bt_le_adv_start(BT_LE_FASTER_ADV, staticAdData, 
+            ARRAY_SIZE(staticAdData), staticResponseData, 
+            ARRAY_SIZE(staticResponseData));
+
     if (err) {
         printk("Advertising failed to start (err %d)\n", err);
         return;
@@ -260,7 +206,10 @@ void os_bluetooth_staticBeaconInit(int err) {
     printk("Beacon started, advertising as %s\n", addr_s);
 }
 
-
+/**
+ * @brief   Initialisation function for mobile beacon bluetooth advertising
+ * @param   err:    Error value - from calling function
+ */
 void os_bluetooth_mobileBeaconInit(int err) {
 
     char addr_s[BT_ADDR_LE_STR_LEN];
@@ -275,8 +224,10 @@ void os_bluetooth_mobileBeaconInit(int err) {
     printk("Bluetooth initialized\n");
 
     // Start advertising
-    err = bt_le_adv_start(BT_LE_FASTER_ADV, staticAdData, ARRAY_SIZE(staticAdData),
-                  staticResponseData, ARRAY_SIZE(staticResponseData));
+    err = bt_le_adv_start(BT_LE_FASTER_ADV, staticAdData, 
+            ARRAY_SIZE(staticAdData), staticResponseData, 
+            ARRAY_SIZE(staticResponseData));
+
     if (err) {
         printk("Advertising failed to start (err %d)\n", err);
         return;
@@ -286,16 +237,22 @@ void os_bluetooth_mobileBeaconInit(int err) {
     bt_addr_le_to_str(&addr, addr_s, sizeof(addr_s));
 
     printk("Beacon started, advertising as %s\n", addr_s);
+
 }
 
-
-
+/**
+ * @brief   Thread routine for mobile node queue listening - this thread is 
+ *          responsible for listening on the queue of incoming bluetooth
+ *          messages from static nodes, and saving their values
+ * @param   args:   Array of arguments
+ */
 uint8_t os_bluetoothMobileListen(void* args) {
 
     NodeQueueItem nodeQueueItem;
 
     while (1) {
 
+        // Get next item from queue
         k_msgq_get(&os_QueueBtNodeMessage, &nodeQueueItem, K_FOREVER);
 
         // Unpack incoming message into bytes
@@ -326,23 +283,20 @@ uint8_t os_bluetoothMobileListen(void* args) {
             }
         }
 
-        
-        // 
-        //nodeList[nodeQueueItem.index].node;
 
-        /*
-        printk("message [%d - RSSI: %d]: ", nodeQueueItem.index, nodeQueueItem.rssi);
+#ifdef DEBUG_PRINT
+
+        printk("message [%d - RSSI: %d]: ", nodeQueueItem.index, 
+                nodeQueueItem.rssi);
     
         for (uint8_t i = 0; i < 16; i++) {
 
             printk("%d:", nodeQueueItem.payload[i]);
         }
         
-        //printk("%d", message);
         printk("\n");
-        //k_msleep(1);
-        */
 
+#endif  // DEBUG_PRINT
         k_mutex_unlock(&os_MutexNodeList);
     }
 
