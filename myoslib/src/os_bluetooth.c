@@ -78,8 +78,8 @@ void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
 		    struct net_buf_simple *buf) {
     
     /*
-    //if (rssi > 50) {
-    printk("Found device [type: %d,  addr: %02x:%02x:%02x:%02x:%02x:%02x,  RSSI: %d,  len: %d,  DAT: %x]\n", addr->type, 
+    if (rssi > -40) {
+    printk("Found device [type: %d,  addr: %02x:%02x:%02x:%02x:%02x:%02x,  RSSI: %d,  len: %d,  DAT: %02x, %02x]\n", addr->type, 
             addr->a.val[0], 
             addr->a.val[1],
             addr->a.val[2],
@@ -87,9 +87,11 @@ void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
             addr->a.val[4],
             addr->a.val[5],
             rssi, buf->len,
-            *buf->data);
-    //}
+            buf->data[13], buf->data[14]);
+    }
     */
+    
+    
     
     /*
     if (addr->a.val[0] == 0xD2 && 
@@ -173,6 +175,7 @@ void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
         // Make up the message item to send to listening thread
         NodeQueueItem nodeQueueItem;
         nodeQueueItem.index = 1;
+        nodeQueueItem.rssi = rssi;
         memcpy(&nodeQueueItem.payload, &payload, sizeof(payload));
 
         // Send off message to listening thread
@@ -195,6 +198,7 @@ void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
         // Make up the message item to send to listening thread
         NodeQueueItem nodeQueueItem;
         nodeQueueItem.index = 2;
+        nodeQueueItem.rssi = rssi;
         memcpy(&nodeQueueItem.payload, &payload, sizeof(payload));
 
         // Send off message to listening thread
@@ -217,6 +221,7 @@ void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
         // Make up the message item to send to listening thread
         NodeQueueItem nodeQueueItem;
         nodeQueueItem.index = 3;
+        nodeQueueItem.rssi = rssi;
         memcpy(&nodeQueueItem.payload, &payload, sizeof(payload));
 
         // Send off message to listening thread
@@ -325,6 +330,7 @@ uint8_t os_bluetoothMobileListen(void* args) {
         // 
         //nodeList[nodeQueueItem.index].node;
 
+        /*
         printk("message [%d - RSSI: %d]: ", nodeQueueItem.index, nodeQueueItem.rssi);
     
         for (uint8_t i = 0; i < 16; i++) {
@@ -335,7 +341,8 @@ uint8_t os_bluetoothMobileListen(void* args) {
         //printk("%d", message);
         printk("\n");
         //k_msleep(1);
-        
+        */
+
         k_mutex_unlock(&os_MutexNodeList);
     }
 

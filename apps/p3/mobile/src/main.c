@@ -67,16 +67,16 @@ void main(void) {
 
     // Initialise known bluetooth static nodes
     NodeListItem node1 = {.index = 0, .node = 
+            {.address = {.val = {0x80, 0x17, 0xF3, 0x5A, 0x73, 0xD8}}, 
+            .hasUltrasonic = 1, .rssi = -128, .ultrasonic = {0, 0}}};
+    NodeListItem node2 = {.index = 1, .node = 
+            {.address = {.val = {0x78, 0x8B, 0x23, 0xD3, 0x34, 0xF0}}, 
+            .hasUltrasonic = 1, .rssi = -128, .ultrasonic = {0, 0}}};
+    NodeListItem node3 = {.index = 2, .node = 
             {.address = {.val = {0xD2, 0x3D, 0x4E, 0x14, 0x23, 0xD9}}, 
             .hasUltrasonic = 0, .rssi = -128, .ultrasonic = {0, 0}}};
-    NodeListItem node2 = {.index = 1, .node = 
-            {.address = {.val = {0xAF, 0xDE, 0xCD, 0xD4, 0x38, 0xE1}}, 
-            .hasUltrasonic = 0, .rssi = -128, .ultrasonic = {0, 0}}};
-    NodeListItem node3 = {.index = 2, .node = 
-            {.address = {.val = {0x80, 0x17, 0xF3, 0x5A, 0x73, 0xD8}}, 
-            .hasUltrasonic = 0, .rssi = -128, .ultrasonic = {0, 0}}};
     NodeListItem node4 = {.index = 3, .node = 
-            {.address = {.val = {0x78, 0x8B, 0x23, 0xD3, 0x34, 0xF0}}, 
+            {.address = {.val = {0xAF, 0xDE, 0xCD, 0xD4, 0x38, 0xE1}}, 
             .hasUltrasonic = 0, .rssi = -128, .ultrasonic = {0, 0}}};
 
     nodeList[0] = node1;
@@ -88,7 +88,7 @@ void main(void) {
 
 	//printk("Starting Scanner/Advertiser Demo\n");
 
-	/* Initialize the Bluetooth Subsystem */
+	// Initialize the Bluetooth Subsystem
 	err = bt_enable(NULL);
 	if (err) {
 		printk("Bluetooth init failed (err %d)\n", err);
@@ -158,6 +158,13 @@ void main(void) {
                         0x00, 0x00, 0x00, 0x00,
                         0x00, 0x00)
         };
+
+        // /*
+        printk("RSSI:  [%04d] [%04d] [%04d] [%04d]  ###   ", rssi0, rssi1, rssi2, rssi3);
+        printk("US  :  [%04d | %04d] [%04d | %04d]  ###   ", us0[0], us0[1], us1[0], us1[1]);
+        printk("TIME:  [%04d] [%04d] [%04d] [%04d]  \n", timeConverter.bytes[0], timeConverter.bytes[1], 
+                timeConverter.bytes[2], timeConverter.bytes[3]);
+        // */
 
         err = bt_le_adv_start(BT_LE_FASTER_ADV, tempAd, ARRAY_SIZE(tempAd), mobileResponseData, ARRAY_SIZE(mobileResponseData));
 
