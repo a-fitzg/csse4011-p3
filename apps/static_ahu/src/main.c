@@ -14,8 +14,6 @@
 #include <usb/usb_device.h>
 #include <os_bluetooth.h>
 
-//#define   ULTRASONIC_NODE
-
 static const struct bt_data staticResponseData[] = {
     BT_DATA(BT_DATA_NAME_COMPLETE, DEVICE_NAME, DEVICE_NAME_LEN),
 }; 
@@ -37,11 +35,14 @@ void main(void) {
         return;
     }
 
-    btErr = bt_enable(os_bluetooth_staticBeaconInit);
+    //btErr = bt_enable(os_bluetooth_staticBeaconInit);
+    btErr = bt_enable(NULL);
     if (btErr) {
 
         printk("Bluetooth init failed (err: %d)\n", btErr);
     }
+
+    k_msleep(5000);
 
 #ifdef ULTRASONIC_NODE
     hal_hci_master_init();    
@@ -58,12 +59,13 @@ void main(void) {
         memcpy(unparsed_msg, rxBuffer, sizeof(uint8_t) * SPI_BUFFER );
         u_sensor = hal_unparse_spi(unparsed_msg);
 
+//printk("Sensor type: %d, preamb: %02x\n", u_sensor.type, u_sensor.preamb);
+
         if (u_sensor.type == 2 && u_sensor.preamb == 0xAA) { // check for SPI preamb and response type, then transfer sensor pulse time over BT
             uint16_t test = ((uint16_t)u_sensor.data[0] << 8) + u_sensor.data[1];
             printk("Test: %d\r\n", test);
         }
-
-        //k_msleep(30);
+        
 
 #else
         k_msleep(30);
@@ -79,7 +81,7 @@ void main(void) {
                         0x00,           // Eddystone UID frame type             
                         0x00,           // Calibrated Tx power at 0m            
 #ifdef ULTRASONIC_NODE
-                        u_sensor[0], u_sensor[1], 
+                        u_sensor.data[0], u_sensor.data[1], 
 #else
                         0x00, 0x00,
 #endif //ULTRASONIC_NODE
