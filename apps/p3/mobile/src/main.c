@@ -81,10 +81,10 @@ void main(void) {
             {.address = {.val = {0x78, 0x8B, 0x23, 0xD3, 0x34, 0xF0}}, 
             .hasUltrasonic = 1, .rssi = -128, .ultrasonic = {0, 0}}};
     NodeListItem node3 = {.index = 2, .node = 
-            {.address = {.val = {0xD2, 0x3D, 0x4E, 0x14, 0x23, 0xD9}}, 
+            {.address = {.val = {0x4D, 0x5F, 0x62, 0xD7, 0x95, 0xCF}}, 
             .hasUltrasonic = 0, .rssi = -128, .ultrasonic = {0, 0}}};
     NodeListItem node4 = {.index = 3, .node = 
-            {.address = {.val = {0xAF, 0xDE, 0xCD, 0xD4, 0x38, 0xE1}}, 
+            {.address = {.val = {0x8A, 0x14, 0x8F, 0x07, 0xFA, 0xF7}}, 
             .hasUltrasonic = 0, .rssi = -128, .ultrasonic = {0, 0}}};
 
     nodeList[0] = node1;
