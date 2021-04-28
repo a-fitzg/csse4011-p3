@@ -59,7 +59,7 @@ static void staticCallback(const bt_addr_le_t* addr, int8_t rssi,
                 rssiList[0],  rssiList[1],  rssiList[2],  rssiList[3],
                 payload[4],   payload[5],   payload[6],   payload[7],
                 payload[8],   payload[9],   payload[10],  payload[11]);
-        printk("%s", message);
+        printf("%s", message);
     }
 }
 
