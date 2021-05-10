@@ -81,18 +81,35 @@ void main(void) {
             {.address = {.val = {0x78, 0x8B, 0x23, 0xD3, 0x34, 0xF0}}, 
             .hasUltrasonic = 1, .rssi = -128, .ultrasonic = {0, 0}}};
     NodeListItem node3 = {.index = 2, .node = 
-            {.address = {.val = {0xD2, 0x3D, 0x4E, 0x14, 0x23, 0xD9}}, 
+            {.address = {.val = {0x4D, 0x5F, 0x62, 0xD7, 0x95, 0xCF}}, 
             .hasUltrasonic = 0, .rssi = -128, .ultrasonic = {0, 0}}};
     NodeListItem node4 = {.index = 3, .node = 
-            {.address = {.val = {0xAF, 0xDE, 0xCD, 0xD4, 0x38, 0xE1}}, 
+            {.address = {.val = {0x8A, 0x14, 0x8F, 0x07, 0xFA, 0xF7}}, 
+            .hasUltrasonic = 0, .rssi = -128, .ultrasonic = {0, 0}}};
+    //-------------------------------------------------------------------------
+    NodeListItem node5 = {.index = 4, .node = 
+            {.address = {.val = {0x68, 0x70, 0x89, 0x63, 0xB1, 0xF4}}, 
+            .hasUltrasonic = 1, .rssi = -128, .ultrasonic = {0, 0}}};
+    NodeListItem node6 = {.index = 5, .node = 
+            {.address = {.val = {0x7D, 0x91, 0x65, 0xB7, 0x03, 0xEC}}, 
+            .hasUltrasonic = 1, .rssi = -128, .ultrasonic = {0, 0}}};
+    NodeListItem node7 = {.index = 6, .node = 
+            {.address = {.val = {0x48, 0x2, 0x93, 0xC1, 0xB0, 0xCD}}, 
+            .hasUltrasonic = 0, .rssi = -128, .ultrasonic = {0, 0}}};
+    NodeListItem node8 = {.index = 7, .node = 
+            {.address = {.val = {0x16, 0x93, 0x2, 0x36, 0xE2, 0xC1}}, 
             .hasUltrasonic = 0, .rssi = -128, .ultrasonic = {0, 0}}};
 
     nodeList[0] = node1;
     nodeList[1] = node2;
     nodeList[2] = node3;
     nodeList[3] = node4;
+    nodeList[4] = node5;
+    nodeList[5] = node6;
+    nodeList[6] = node7;
+    nodeList[7] = node8;
 
-    k_sleep(K_MSEC(10000));
+    k_sleep(K_MSEC(1000));
 
 	// Initialize the Bluetooth Subsystem
 	err = bt_enable(NULL);
@@ -113,10 +130,12 @@ void main(void) {
     while (1) {
 
         // RSSI values
-        int8_t rssi0, rssi1, rssi2, rssi3;
+        int8_t rssi0, rssi1, rssi2, rssi3, rssi4, rssi5, rssi6, rssi7;
         // Ultrasonic values
         uint8_t us0[2];
         uint8_t us1[2];
+        uint8_t us2[2];
+        uint8_t us3[2];
 
         // Now get the values
         // Accessing variable shared across multiple threads, need to ensure
@@ -127,12 +146,21 @@ void main(void) {
         rssi1 = nodeList[1].node.rssi;
         rssi2 = nodeList[2].node.rssi;
         rssi3 = nodeList[3].node.rssi;
+        rssi4 = nodeList[4].node.rssi;
+        rssi5 = nodeList[5].node.rssi;
+        rssi6 = nodeList[6].node.rssi;
+        rssi7 = nodeList[7].node.rssi;
 
-        // Define node list items 0 and 1 ultrasonic nodes
+        // Define node list items 0 and 1 ultrasonic nodes (in group 1)
+        // Define node list items 4 and 5 ultrasonic nodes (in group 2)
         us0[0] = nodeList[0].node.ultrasonic[0];
         us0[1] = nodeList[0].node.ultrasonic[1];
         us1[0] = nodeList[1].node.ultrasonic[0];
         us1[1] = nodeList[1].node.ultrasonic[1];
+        us2[0] = nodeList[4].node.ultrasonic[0];
+        us2[1] = nodeList[4].node.ultrasonic[1];
+        us3[0] = nodeList[5].node.ultrasonic[0];
+        us3[1] = nodeList[5].node.ultrasonic[1];
 
         // Get current uptime
         uint32_t uptime = (uint32_t)k_uptime_get();
@@ -151,6 +179,9 @@ void main(void) {
         // Now we have the necessary values, send them off to the base node
         btErr = bt_le_adv_stop();
 
+        int asdf = us2[0];
+        int qwertyuiop = us3[0];
+
         const struct bt_data tempAd[] = {
                 BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
                 BT_DATA_BYTES(BT_DATA_UUID16_ALL, 0xAA, 0xFE),
@@ -159,10 +190,10 @@ void main(void) {
                         0x00,           // Eddystone UID frame type
                         0x00,           // Calibrated Tx power at 0m
                         rssi0,  rssi1,  rssi2,  rssi3, 
+                        rssi4,  rssi5,  rssi6,  rssi7,
                         us0[0], us0[1], us1[0], us1[1], 
-                        timeConverter.bytes[0], timeConverter.bytes[1], 
-                        timeConverter.bytes[2], timeConverter.bytes[3],
-                        0x00, 0x00, 0x00, 0x00,
+                        us2[0], us2[1], 
+                        us3[0], us3[1],
                         0x00, 0x00)
         };
 
@@ -177,6 +208,6 @@ void main(void) {
 
         k_sleep(K_MSEC(30));
 
-    }
+    } 
 }
 

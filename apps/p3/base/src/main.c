@@ -30,7 +30,8 @@
 #include <os_bluetooth.h>
 
 // Bluetooth address of mobile node
-bt_addr_t mobileAddress = {.val = {0xAF, 0xDE, 0xCD, 0xD4, 0x38, 0xE1}};
+bt_addr_t mobileAddrPrimary = {.val = {0xAF, 0xDE, 0xCD, 0xD4, 0x38, 0xE1}};
+bt_addr_t mobileAddrSecondary = {.val = {0xB7, 0x14, 0x80, 0xB8, 0xB9, 0xEF}};
 
 /**
  * @brief   Callback for bluetooth scan
@@ -42,7 +43,7 @@ bt_addr_t mobileAddress = {.val = {0xAF, 0xDE, 0xCD, 0xD4, 0x38, 0xE1}};
 static void staticCallback(const bt_addr_le_t* addr, int8_t rssi, 
         uint8_t adv_type, struct net_buf_simple* buf) {
 
-    if (addressesEqual(addr->a, mobileAddress)) {
+    if (addressesEqual(addr->a, mobileAddrPrimary)) {
 
         // We have a message from our mobile node...
         uint8_t payload[PAYLOAD_SIZE];
@@ -51,16 +52,43 @@ static void staticCallback(const bt_addr_le_t* addr, int8_t rssi,
             payload[i] = buf->data[i + PAYLOAD_BUFFER_OFFSET];
         }
 
-        int8_t rssiList[] = {payload[0], payload[1], payload[2], payload[3]};
+        int8_t rssiList[] = {payload[0], payload[1], payload[2], payload[3], 
+                             payload[4], payload[5], payload[6], payload[7]};
 
         // Make a message with the packet information, then send it over UART
         char message[80];
-        sprintf(message, "%i,%i,%i,%i,%d,%d,%d,%d,%d,%d,%d,%d\n", 
+        sprintf(message, "%i,%i,%i,%i,%i,%i,%i,%i,%d,%d,%d,%d,%d,%d,%d,%d,%d\n", 
+                rssiList[4],  rssiList[5],  rssiList[6],  rssiList[7], 
                 rssiList[0],  rssiList[1],  rssiList[2],  rssiList[3],
-                payload[4],   payload[5],   payload[6],   payload[7],
-                payload[8],   payload[9],   payload[10],  payload[11]);
+                payload[8],   payload[9],   payload[10],  payload[11],
+                payload[12],  payload[13],  payload[14],  payload[15],
+                0);
         printf("%s", message);
     }
+
+    if (addressesEqual(addr->a, mobileAddrSecondary)) {
+
+        // We have a message from the other mobile node...
+        uint8_t payload[PAYLOAD_SIZE];
+        for (uint8_t i = 0; i < PAYLOAD_SIZE; i++) {
+
+            payload[i] = buf->data[i + PAYLOAD_BUFFER_OFFSET];
+        }
+
+        int8_t rssiList[] = {payload[8], payload[9], payload[10], payload[11],
+                             payload[4], payload[5], payload[6],  payload[7]};
+
+        char message[80];
+        sprintf(message, "%i,%i,%i,%i,%i,%i,%i,%i,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
+                rssiList[4],  rssiList[5],  rssiList[6],  rssiList[7], 
+                rssiList[0],  rssiList[1],  rssiList[2],  rssiList[3],
+                payload[8],   payload[9],   payload[10],  payload[11],
+                payload[12],  payload[13],  payload[14],  payload[15],
+                1);
+        printf("%s", message);
+
+    }
+
 }
 
 void main(void) {

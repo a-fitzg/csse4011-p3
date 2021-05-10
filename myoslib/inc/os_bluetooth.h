@@ -7,7 +7,7 @@
 #define DEVICE_NAME             CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN         (sizeof(DEVICE_NAME) - 1)
 
-#define NUM_STATIC_NODES        4
+#define NUM_STATIC_NODES        8
 #define PAYLOAD_SIZE            16
 #define PAYLOAD_BUFFER_OFFSET   13
 #define NODE_QUEUE_ALIGNMENT    32

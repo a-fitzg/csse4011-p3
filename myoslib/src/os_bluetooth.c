@@ -73,7 +73,7 @@ uint8_t addressesEqual(bt_addr_t address1, bt_addr_t address2) {
  * @param       adv_type:   Response message type
  * @param       buf:        Data buffer of message
  */
-void bt_mobileBallback(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
+void bt_mobileCallback(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
 		    struct net_buf_simple *buf) {
     
     // Listen for messages from node 1
@@ -161,6 +161,102 @@ void bt_mobileBallback(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
         // Make up the message item to send to listening thread
         NodeQueueItem nodeQueueItem;
         nodeQueueItem.index = 3;
+        nodeQueueItem.rssi = rssi;
+        memcpy(&nodeQueueItem.payload, &payload, sizeof(payload));
+
+        // Send off message to listening thread
+        while (k_msgq_put(&os_QueueBtNodeMessage, &nodeQueueItem, K_NO_WAIT) 
+                != 0) {
+
+            k_msgq_purge(&os_QueueBtNodeMessage);
+        }
+    }
+
+    // Listen for messages from node 5
+    if (addressesEqual(addr->a, nodeList[4].node.address)) {
+
+        uint8_t payload[PAYLOAD_SIZE];
+        // Make up the payload array
+        for (uint8_t i = 0; i < PAYLOAD_SIZE; i++) {
+
+            payload[i] = buf->data[i + PAYLOAD_BUFFER_OFFSET];
+        }
+        
+        // Make up the message item to send to listening thread
+        NodeQueueItem nodeQueueItem;
+        nodeQueueItem.index = 4;
+        nodeQueueItem.rssi = rssi;
+        memcpy(&nodeQueueItem.payload, &payload, sizeof(payload));
+
+        // Send off message to listening thread
+        while (k_msgq_put(&os_QueueBtNodeMessage, &nodeQueueItem, K_NO_WAIT) 
+                != 0) {
+
+            k_msgq_purge(&os_QueueBtNodeMessage);
+        }
+    }
+
+    // Listen for messages from node 6
+    else if (addressesEqual(addr->a, nodeList[5].node.address)) {
+
+        uint8_t payload[PAYLOAD_SIZE];
+        // Make up the payload array
+        for (uint8_t i = 0; i < PAYLOAD_SIZE; i++) {
+
+            payload[i] = buf->data[i + PAYLOAD_BUFFER_OFFSET];
+        }
+        
+        // Make up the message item to send to listening thread
+        NodeQueueItem nodeQueueItem;
+        nodeQueueItem.index = 5;
+        nodeQueueItem.rssi = rssi;
+        memcpy(&nodeQueueItem.payload, &payload, sizeof(payload));
+
+        // Send off message to listening thread
+        while (k_msgq_put(&os_QueueBtNodeMessage, &nodeQueueItem, K_NO_WAIT) 
+                != 0) {
+
+            k_msgq_purge(&os_QueueBtNodeMessage);
+        }
+    }
+
+    // Listen for messages from node 7
+    else if (addressesEqual(addr->a, nodeList[6].node.address)) {
+
+        uint8_t payload[PAYLOAD_SIZE];
+        // Make up the payload array
+        for (uint8_t i = 0; i < PAYLOAD_SIZE; i++) {
+
+            payload[i] = buf->data[i + PAYLOAD_BUFFER_OFFSET];
+        }
+        
+        // Make up the message item to send to listening thread
+        NodeQueueItem nodeQueueItem;
+        nodeQueueItem.index = 6;
+        nodeQueueItem.rssi = rssi;
+        memcpy(&nodeQueueItem.payload, &payload, sizeof(payload));
+
+        // Send off message to listening thread
+        while (k_msgq_put(&os_QueueBtNodeMessage, &nodeQueueItem, K_NO_WAIT) 
+                != 0) {
+
+            k_msgq_purge(&os_QueueBtNodeMessage);
+        }
+    }
+
+    // Listen for messages from node 8
+    else if (addressesEqual(addr->a, nodeList[7].node.address)) {
+
+        uint8_t payload[PAYLOAD_SIZE];
+        // Make up the payload array
+        for (uint8_t i = 0; i < PAYLOAD_SIZE; i++) {
+
+            payload[i] = buf->data[i + PAYLOAD_BUFFER_OFFSET];
+        }
+        
+        // Make up the message item to send to listening thread
+        NodeQueueItem nodeQueueItem;
+        nodeQueueItem.index = 7;
         nodeQueueItem.rssi = rssi;
         memcpy(&nodeQueueItem.payload, &payload, sizeof(payload));
 

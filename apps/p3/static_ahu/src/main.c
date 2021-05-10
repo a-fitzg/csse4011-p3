@@ -40,7 +40,8 @@ void main(void) {
 
     // Initialise USB UART for debugging
     usb = device_get_binding(CONFIG_UART_CONSOLE_ON_DEV_NAME);
-	
+
+#ifdef DEBUG_USB
     if (usb == NULL) {
         return;
     }
@@ -48,6 +49,7 @@ void main(void) {
     if (usb_enable(NULL)) {
         return;
     }
+#endif
 
     btErr = bt_enable(NULL);
     if (btErr) {
