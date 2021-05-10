@@ -88,7 +88,7 @@ def minimise(point):
 
 def readSerial():
     try:
-        serial_conn = Serial(port='/dev/ttyACM0', baudrate=115200)
+        serial_conn = Serial(port='COM12', baudrate=115200)
         rssi1 = 0
         rssi2 = 0
         rssi3 = 0
