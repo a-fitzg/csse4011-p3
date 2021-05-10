@@ -5,6 +5,8 @@ from tkinter import filedialog
 from tkinter import messagebox
 from serial import *
 import time
+
+#import matplotlib.pyplot as plt
 import sys
 import io
 # from PIL import Image
@@ -15,8 +17,8 @@ import scipy.optimize as opt
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-GRID_X_SIZE = 4
-GRID_Y_SIZE = 4
+GRID_X_SIZE = 3.78
+GRID_Y_SIZE = 3.32
 
 x_beacons = [0, 0, GRID_X_SIZE, GRID_X_SIZE]
 y_beacons = [0, GRID_Y_SIZE, GRID_Y_SIZE, 0]
@@ -256,3 +258,18 @@ locy = Label(centre_seg3, font=("Georgia", 8), text="Undetected", textvariable=l
 locx.grid(column=1, row=1, padx=10, pady=10)
 locy.grid(column=1, row=2, padx=10, pady=10)
 main_window.mainloop()
+
+
+# if __name__ == "__main__":
+#
+#     app = App()
+#
+#     x,y = app.poll()
+#
+#     while 1:
+#
+#         plt.scatter(x, y)
+#         plt.title(f'x:{x} y:{y}')
+#         plt.pause(0.5)
+#
+#     plt.show()
