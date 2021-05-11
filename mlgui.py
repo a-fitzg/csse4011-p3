@@ -2,6 +2,9 @@ import tago
 import numpy as np
 import scipy.optimize as opt
 from sklearn.neighbors import KNeighborsClassifier   
+from pykalman import KalmanFilter
+import matplotlib.pyplot as plt
+import time
 
 MY_DEVICE_TOKEN = '3503290b-05e5-433d-a864-e1b8e7bfbf11'
 my_device = tago.Device(MY_DEVICE_TOKEN)
@@ -88,9 +91,44 @@ def get_trainingmodel():
  
     return model
 
+def Kalman(raw_data):
+    kf = KalmanFilter(initial_state_mean=[0,0], n_dim_obs=1)
+    measurements = np.asarray(raw_data)  # 2 observations
+    initial_state_mean = [measurements[0, 0],
+                        0,
+                        measurements[0, 1],
+                        0]
+    transition_matrix = [[1, 1, 0, 0],
+                        [0, 1, 0, 0],
+                        [0, 0, 1, 1],
+                        [0, 0, 0, 1]]
+    observation_matrix = [[1, 0, 0, 0],
+                        [0, 0, 1, 0]]
+
+    kf1 = KalmanFilter(transition_matrices = transition_matrix,
+                    observation_matrices = observation_matrix,
+                    initial_state_mean = initial_state_mean)
+    kf1 = kf1.em(measurements, n_iter=5)
+    (smoothed_state_means, smoothed_state_covariances) = kf1.smooth(measurements)
+    x = smoothed_state_means[:, 0]
+    y = smoothed_state_means[:, 2]
+    # mean_x = mean(x)
+    # mean_y = mean(y)
+    # print(mean_x)
+    # print(mean_y)
+    # print(smoothed_state_means)
+    mean_x = (sum(x)) / len(x)
+    mean_y = (sum(y)) / len(y)
+    print(mean_x)
+    print(mean_y)
+    return [mean_x, mean_y]
+
 
 if __name__ == "__main__":
     model = get_trainingmodel()
+    temp_k = list()
+    temp_m = list()
+    temp_combine = list()
     while True:
         retrived = my_device.find({'variable':['rssi1','rssi2','ultrasonic'],'query':'last_value'})
         for d in retrived['result']:
@@ -156,9 +194,17 @@ if __name__ == "__main__":
         endpos_m1 = opt.fmin_powell(minimise_m1, start_m1)
         endpos_m2 = opt.fmin_powell(minimise_m2, start_m2)
 
-        print(f"NODE 1 LOCATION: ({endpos_m1[0]}, {endpos_m1[1]})")
-        print(f"NODE 2 LOCATION: ({endpos_m2[0]}, {endpos_m2[1]})")
+        # print(f"NODE 1 LOCATION: ({endpos_m1[0]}, {endpos_m1[1]})")
+        # print(f"NODE 2 LOCATION: ({endpos_m2[0]}, {endpos_m2[1]})")
+        if (len(temp_k) > 5):
+            temp_combine = temp_k + temp_m
+            loc1 = Kalman(temp_combine)
+            temp_k = []
+            temp_m = []
+        temp_m.append(endpos_m1)
+        temp_k.append(predicted_m1[0])
+        # print(predicted_m1[0])
+        # print(predicted_m2[0])
+        # print(retrived_parsed3)
 
-        print(predicted_m1[0])
-        print(predicted_m2[0])
-        print(retrived_parsed3)
+

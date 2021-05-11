@@ -9,7 +9,7 @@ us_list = list()
 
 
 
-def sendData(rssi_primary, rs_secondary,us):
+def sendData(rssi_primary, rssi_secondary,us):
     MY_DEVICE_TOKEN = '3503290b-05e5-433d-a864-e1b8e7bfbf11'
     my_device = tago.Device(MY_DEVICE_TOKEN)
     data = [{
