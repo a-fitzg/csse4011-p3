@@ -1,10 +1,32 @@
 from serial import *
 import time
 import re
+import tago
 
 rssi_list_primary = list()
 rssi_list_secondary = list()
 us_list = list()
+
+
+
+def sendData(rssi_primary, rs_secondary,us):
+    MY_DEVICE_TOKEN = '3503290b-05e5-433d-a864-e1b8e7bfbf11'
+    my_device = tago.Device(MY_DEVICE_TOKEN)
+    data = [{
+        'variable': 'rssi1',
+        'value': rssi_primary
+    },{
+        'variable': 'rssi2',
+        'value': rssi_secondary
+    },{
+        'variable': 'ultrasonic',
+        'value': us
+    }]
+    result = my_device.insert(data)
+    if result['status']:
+        print(result['result'])
+    else:
+        print(result['message'])
 
 
 def readSerial():
@@ -41,5 +63,5 @@ if __name__ == "__main__":
         else:
             # Dodgy node number
             pass
-
+        sendData(rssi_list_primary, rssi_list_secondary, us_list)
         time.sleep(0.05)
