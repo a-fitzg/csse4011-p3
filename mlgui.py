@@ -136,12 +136,14 @@ if __name__ == "__main__":
             else:
                 valid_x_m2.append(X_BEACONS[j])
                 valid_y_m2.append(Y_BEACONS[j])
-                valid_rad_m1.append(10 ** ((-58 - rssi_dists_m2[j]) / 30))
+                valid_rad_m2.append(10 ** ((-58 - rssi_dists_m2[j]) / 30))
 
         valid_x_glob_m1 = valid_x_m1.copy()
         valid_y_glob_m1 = valid_y_m1.copy()
         valid_x_glob_m2 = valid_x_m2.copy()
         valid_y_glob_m2 = valid_y_m2.copy()
+        valid_rad_glob_m1 = valid_rad_m1.copy()
+        valid_rad_glob_m2 = valid_rad_m2.copy()
 
         x_rand_m1 = np.random.rand(1)
         y_rand_m1 = np.random.rand(1)
