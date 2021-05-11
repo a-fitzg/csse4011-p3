@@ -5,9 +5,14 @@ from sklearn.neighbors import KNeighborsClassifier
 from pykalman import KalmanFilter
 import matplotlib.pyplot as plt
 import time
+import matplotlib.animation as animation
 
 MY_DEVICE_TOKEN = '3503290b-05e5-433d-a864-e1b8e7bfbf11'
 my_device = tago.Device(MY_DEVICE_TOKEN)
+
+fig = plt.figure(figsize=(12,6), facecolor='#DEDEDE')
+ax = plt.subplot(121)
+ax1 = plt.subplot(122)
 
 GRID_X_SIZE = 8
 GRID_Y_SIZE = 4
@@ -133,16 +138,39 @@ def Kalman(raw_data):
     # print(smoothed_state_means)
     mean_x = (sum(x)) / len(x)
     mean_y = (sum(y)) / len(y)
-    print(mean_x)
-    print(mean_y)
     return [mean_x, mean_y]
+
+def animate(loc1, loc2):
+    # Draw x and y lists
+    ax.clear()
+    ax1.clear()
+    ax.scatter(loc1[0],loc1[1])
+    ax.set_title('Mobile 1')
+    ax.set_xlabel('x axis')
+    ax.set_ylabel('y axis')
+    ax.set_xlim([0,8])
+    ax.set_ylim([0,4])
+    ax1.scatter(loc2[0],loc2[1])
+
+    # Format plot
+
+    ax1.set_title('Mobile 2')
+    ax1.set_xlabel('x axis')
+    ax1.set_ylabel('y axis')
+    ax1.set_xlim([0,8])
+    ax1.set_ylim([0,4])
+    plt.show()
 
 
 if __name__ == "__main__":
     model = get_trainingmodel()
-    temp_k = list()
-    temp_m = list()
-    temp_combine = list()
+
+    temp_k1 = list()
+    temp_m1 = list()
+    temp_combine1 = list()
+    temp_k2 = list()
+    temp_m2 = list()
+    temp_combine2 = list()
     while True:
         retrived = my_device.find({'variable':['rssi1','rssi2','ultrasonic'],'query':'last_value'})
         for d in retrived['result']:
@@ -222,17 +250,23 @@ if __name__ == "__main__":
         endpos_m1 = opt.fmin_powell(minimise_m1, start_m1, disp=False)
         endpos_m2 = opt.fmin_powell(minimise_m2, start_m2, disp=False)
 
-        # print(f"NODE 1 LOCATION: ({endpos_m1[0]}, {endpos_m1[1]})")
-        # print(f"NODE 2 LOCATION: ({endpos_m2[0]}, {endpos_m2[1]})")
-        if (len(temp_k) > 5):
-            temp_combine = temp_k + temp_m
-            loc1 = Kalman(temp_combine)
-            temp_k = []
-            temp_m = []
-        temp_m.append(endpos_m1)
-        temp_k.append(predicted_m1[0])
-        # print(predicted_m1[0])
-        # print(predicted_m2[0])
-        # print(retrived_parsed3)
+        if (len(temp_k1) > 1):
+            temp_combine1 = temp_k1 + temp_m1
+            temp_combine2 = temp_k2 + temp_m2
+            loc1 = Kalman(temp_combine1)
+            loc2 = Kalman(temp_combine2)
+            # animate(loc1,loc2)
+            print(loc1)
+            print(loc2)
+            temp_k1 = []
+            temp_m1 = []
+            temp_k2 = []
+            temp_m2 = []
+            temp_combine1 = []
+            temp_combine2 = []
+        temp_m2.append(endpos_m2)
+        temp_k2.append(predicted_m2[0])
+        temp_m1.append(endpos_m1)
+        temp_k1.append(predicted_m1[0])
 
 
