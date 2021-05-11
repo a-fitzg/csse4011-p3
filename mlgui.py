@@ -6,8 +6,6 @@ my_device = tago.Device(MY_DEVICE_TOKEN)
 
 temp2 = []
 
-
-
 def get_trainingmodel():
   ITERATE_X = 8
   ITERATE_Y = 10
@@ -41,19 +39,18 @@ def get_trainingmodel():
   return model
 
 if __name__ == "__main__":
-## Retrive data from dashboard after this line
+  model = get_trainingmodel()
   while True:
-
     retrived = my_device.find({'variable':['rssi1','rssi2','ultrasonic'],'query':'last_value'})
-    model = get_trainingmodel()
     for d in retrived['result']:
       temp2.append(d['value'])
     retrived_parsed1 = [int(s) for s in temp2[0].split(',')]
     retrived_parsed2 = [int(s) for s in temp2[1].split(',')]
-    retrived_parsed3 = [int(s) for s in temp2[2].split(',')]
-    predicted_m1= model.predict([retrived_parsed1]) ## RSSI value here
-    predicted_m2= model.predict([retrived_parsed2]) ## RSSI value here
+    retrived_parsed3 = [int(s) for s in temp2[2].split(',')] ## ultrasonic value
+    temp2 = []
+    predicted_m1= model.predict([retrived_parsed1]) ## mobile1 value here
+    predicted_m2= model.predict([retrived_parsed2]) ## mobile2 value here
     print(predicted_m1[0])
     print(predicted_m2[0])
     print(retrived_parsed3)
-    temp2 = []
+
