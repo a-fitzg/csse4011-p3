@@ -12,77 +12,83 @@ us_list = list()
 def sendData(rssi_primary, rssi_secondary,us):
     MY_DEVICE_TOKEN = '3503290b-05e5-433d-a864-e1b8e7bfbf11'
     my_device = tago.Device(MY_DEVICE_TOKEN)
-    data = [{
-        'variable': 'rssi1',
-        'value': rssi_primary
-    },{
-        'variable': 'rssi2',
-        'value': rssi_secondary
-    },{
-        'variable': 'ultrasonic',
-        'value': us
-    },{
-        'variable': 'rssi1_1',
-        'value': rssi_primary[0]
-    },{
-        'variable': 'rssi1_2',
-        'value': rssi_primary[1]
-    },{
-        'variable': 'rssi1_3',
-        'value': rssi_primary[2]
-    },{
-        'variable': 'rssi1_4',
-        'value': rssi_primary[3]
-    },{
-        'variable': 'rssi1_5',
-        'value': rssi_primary[4]
-    },{
-        'variable': 'rssi1_6',
-        'value': rssi_primary[5]
-    },{
-        'variable': 'rssi1_7',
-        'value': rssi_primary[6]
-    },{
-        'variable': 'rssi1_8',
-        'value': rssi_secondary[7]
-    },{
-        'variable': 'rssi2_1',
-        'value': rssi_secondary[0]
-    },{
-        'variable': 'rssi2_2',
-        'value': rssi_secondary[1]
-    },{
-        'variable': 'rssi2_3',
-        'value': rssi_secondary[2]
-    },{
-        'variable': 'rssi2_4',
-        'value': rssi_secondary[3]
-    },{
-        'variable': 'rssi2_5',
-        'value': rssi_secondary[4]
-    },{
-        'variable': 'rssi2_6',
-        'value': rssi_secondary[5]
-    },{
-        'variable': 'rssi2_7',
-        'value': rssi_secondary[6]
-    },{
-        'variable': 'rssi2_8',
-        'value': rssi_secondary[7]
-    },{
-        'variable': 'ultrasonic1',
-        'value': us[0]
-    },{
-        'variable': 'ultrasonic2',
-        'value': us[1]
-    },{
-        'variable': 'ultrasonic3',
-        'value': us[2]
-    },{
-        'variable': 'ultrasonic4',
-        'value': us[3]
-    }]
-    result = my_device.insert(data)
+    try:
+        data = [{
+            'variable': 'rssi1',
+            'value': rssi_primary
+        },{
+            'variable': 'rssi2',
+            'value': rssi_secondary
+        },{
+            'variable': 'ultrasonic',
+            'value': us
+        },{
+            'variable': 'rssi1_1',
+            'value': rssi_primary[0]
+        },{
+            'variable': 'rssi1_2',
+            'value': rssi_primary[1]
+        },{
+            'variable': 'rssi1_3',
+            'value': rssi_primary[2]
+        },{
+            'variable': 'rssi1_4',
+            'value': rssi_primary[3]
+        },{
+            'variable': 'rssi1_5',
+            'value': rssi_primary[4]
+        },{
+            'variable': 'rssi1_6',
+            'value': rssi_primary[5]
+        },{
+            'variable': 'rssi1_7',
+            'value': rssi_primary[6]
+        },{
+            'variable': 'rssi1_8',
+            'value': rssi_secondary[7]
+        },{
+            'variable': 'rssi2_1',
+            'value': rssi_secondary[0]
+        },{
+            'variable': 'rssi2_2',
+            'value': rssi_secondary[1]
+        },{
+            'variable': 'rssi2_3',
+            'value': rssi_secondary[2]
+        },{
+            'variable': 'rssi2_4',
+            'value': rssi_secondary[3]
+        },{
+            'variable': 'rssi2_5',
+            'value': rssi_secondary[4]
+        },{
+            'variable': 'rssi2_6',
+            'value': rssi_secondary[5]
+        },{
+            'variable': 'rssi2_7',
+            'value': rssi_secondary[6]
+        },{
+            'variable': 'rssi2_8',
+            'value': rssi_secondary[7]
+        },{
+            'variable': 'ultrasonic1',
+            'value': us[0]
+        },{
+            'variable': 'ultrasonic2',
+            'value': us[1]
+        },{
+            'variable': 'ultrasonic3',
+            'value': us[2]
+        },{
+            'variable': 'ultrasonic4',
+            'value': us[3]
+        }]
+        result = my_device.insert(data)
+    except IndexError:
+        return
+
+    print("##########  SENT  ###########")
+
     if result['status']:
         print(result['result'])
     else:

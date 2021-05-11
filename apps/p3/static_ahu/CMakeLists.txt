@@ -7,6 +7,6 @@ project(usonic)
 include_directories(../../../myoslib/inc)
 target_sources(app PRIVATE src/main.c ../../../myoslib/src/hal_hci.c ../../../myoslib/src/hal_packet ../../../myoslib/src/os_bluetooth.c)
 
-#target_compile_definitions(app PUBLIC -DULTRASONIC_NODE)
+target_compile_definitions(app PUBLIC -DULTRASONIC_NODE)
 
 

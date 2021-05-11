@@ -117,6 +117,7 @@ void main(void) {
 
         btErr = bt_le_adv_start(BT_LE_FASTER_ADV, tempAd, ARRAY_SIZE(tempAd), 
                 staticResponseData, ARRAY_SIZE(staticResponseData));
+        printk("SENT  \n");
     }
 }
 
