@@ -14,10 +14,15 @@ GRID_Y_SIZE = 4
 
 NUM_STATIC_NODES = 8
 
+RSSI_WEIGHT = 1
+US_WEIGHT = 0.001
+
 X_BEACONS = [0, GRID_X_SIZE, GRID_X_SIZE / 3, 2 * GRID_X_SIZE / 3,
              GRID_X_SIZE, 0, GRID_X_SIZE / 3, 2 * GRID_X_SIZE / 3]
 Y_BEACONS = [GRID_Y_SIZE, GRID_Y_SIZE, 0, 0,
              0, 0, GRID_Y_SIZE, GRID_Y_SIZE]
+US_X_BEACONS = [GRID_X_SIZE, 0, 0, GRID_X_SIZE]
+US_Y_BEACONS = [0, 0, GRID_Y_SIZE , GRID_Y_SIZE]
 
 valid_x_glob_m1 = []
 valid_y_glob_m1 = []
@@ -25,6 +30,7 @@ valid_rad_glob_m1 = []
 valid_x_glob_m2 = []
 valid_y_glob_m2 = []
 valid_rad_glob_m2 = []
+valid_us_glob = []
 
 temp2 = []
 
@@ -39,8 +45,12 @@ def calc_distance_m1(point):
 
 
 def minimise_m1(point):
+    weights = []
+    weights = [RSSI_WEIGHT for _ in range(len(valid_rad_glob_m1))]
+    weights[-4:] = 4 * [US_WEIGHT]
+
     dist = calc_distance_m1(point)
-    err = np.linalg.norm(dist / valid_rad_glob_m1)
+    err = np.linalg.norm(dist / [a * b for a, b in zip(valid_rad_glob_m1, weights)])
     return err
 
 
@@ -54,8 +64,12 @@ def calc_distance_m2(point):
 
 
 def minimise_m2(point):
+    weights = []
+    weights = [RSSI_WEIGHT for _ in range(len(valid_rad_glob_m2))]
+    weights[-4:] = 4 * [US_WEIGHT]
+
     dist = calc_distance_m2(point)
-    err = np.linalg.norm(dist / valid_rad_glob_m2)
+    err = np.linalg.norm(dist / [a * b for a, b in zip(valid_rad_glob_m1, weights)])
     return err
 
 
@@ -150,6 +164,11 @@ if __name__ == "__main__":
         rssi_dists_m1 = []
         rssi_dists_m2 = []
 
+        us_vals = [retrived_parsed3[0] / 35,
+                   retrived_parsed3[1] / 35,
+                   retrived_parsed3[2] / 35,
+                   retrived_parsed3[3] / 35]
+
         for i in retrived_parsed1:
             rssi_dists_m1.append(i)
 
@@ -176,6 +195,15 @@ if __name__ == "__main__":
                 valid_y_m2.append(Y_BEACONS[j])
                 valid_rad_m2.append(10 ** ((-58 - rssi_dists_m2[j]) / 30))
 
+        for k in range(4):
+            if us_vals[k] < 1.5:
+                valid_x_m1.append(US_X_BEACONS[k])
+                valid_x_m2.append(US_X_BEACONS[k])
+                valid_y_m1.append(US_Y_BEACONS[k])
+                valid_y_m2.append(US_Y_BEACONS[k])
+                valid_rad_m1.append(us_vals[k])
+                valid_rad_m2.append(us_vals[k])
+
         valid_x_glob_m1 = valid_x_m1.copy()
         valid_y_glob_m1 = valid_y_m1.copy()
         valid_x_glob_m2 = valid_x_m2.copy()
@@ -191,8 +219,8 @@ if __name__ == "__main__":
         start_m1 = (x_rand_m1, y_rand_m1)
         start_m2 = (x_rand_m2, y_rand_m2)
 
-        endpos_m1 = opt.fmin_powell(minimise_m1, start_m1)
-        endpos_m2 = opt.fmin_powell(minimise_m2, start_m2)
+        endpos_m1 = opt.fmin_powell(minimise_m1, start_m1, disp=False)
+        endpos_m2 = opt.fmin_powell(minimise_m2, start_m2, disp=False)
 
         # print(f"NODE 1 LOCATION: ({endpos_m1[0]}, {endpos_m1[1]})")
         # print(f"NODE 2 LOCATION: ({endpos_m2[0]}, {endpos_m2[1]})")
