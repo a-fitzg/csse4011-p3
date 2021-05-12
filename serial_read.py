@@ -5,11 +5,12 @@ import tago
 
 rssi_list_primary = list()
 rssi_list_secondary = list()
-us_list = list()
+us_list_primary = list()
+us_list_secondary = list()
 
 
 
-def sendData(rssi_primary, rssi_secondary,us):
+def sendData(rssi_primary, rssi_secondary,us1, us2):
     MY_DEVICE_TOKEN = '3503290b-05e5-433d-a864-e1b8e7bfbf11'
     my_device = tago.Device(MY_DEVICE_TOKEN)
     try:
@@ -20,8 +21,11 @@ def sendData(rssi_primary, rssi_secondary,us):
             'variable': 'rssi2',
             'value': rssi_secondary
         },{
-            'variable': 'ultrasonic',
-            'value': us
+            'variable': 'ultrasonic1',
+            'value': us1
+        },{
+            'variable': 'ultrasonic2',
+            'value': us2
         },{
             'variable': 'rssi1_1',
             'value': rssi_primary[0]
@@ -83,6 +87,7 @@ def sendData(rssi_primary, rssi_secondary,us):
             'variable': 'ultrasonic4',
             'value': us[3]
         }]
+        print('here')
         result = my_device.insert(data)
     except IndexError:
         return
@@ -108,8 +113,9 @@ def readSerial():
         return
 
 
+
 if __name__ == "__main__":
-    ser = Serial(port="/dev/ttyACM0", baudrate=115200, parity=PARITY_NONE, bytesize=EIGHTBITS, stopbits=STOPBITS_ONE,
+    ser = Serial(port="COM8", baudrate=115200, parity=PARITY_NONE, bytesize=EIGHTBITS, stopbits=STOPBITS_ONE,
                  timeout=0)
 
     while True:
@@ -118,14 +124,15 @@ if __name__ == "__main__":
             continue
         temp_list_rssi = [int(i) for i in data_tokens[0:8]]
         temp_list_us = [int(i) for i in data_tokens[8:16]]
-        if int(data_tokens[-1]) == 0:
-            # Primary node
-            rssi_list_primary = temp_list_rssi.copy()
-            print(f"NODE 0: RSSI: {{{rssi_list_primary}}}, US: {{{temp_list_us}}} ")
-        elif int(data_tokens[-1]) == 1:
-            # Secondary node
-            rssi_list_secondary = temp_list_rssi.copy()
-            print(f"NODE 1: {{{rssi_list_secondary}}}, US: {{{temp_list_us}}}")
+        if int(data_tokens[-1]) == 0 or int(data_tokens[-1]) == 1:
+            if int(data_tokens[-1]) == 0:
+                # Primary node
+                rssi_list_primary = temp_list_rssi.copy()
+                print(f"NODE 0: RSSI: {{{rssi_list_primary}}}, US: {{{temp_list_us}}} ")
+            if int(data_tokens[-1]) == 1:
+                # Secondary node
+                rssi_list_secondary = temp_list_rssi.copy()
+                print(f"NODE 1: {{{rssi_list_secondary}}}, US: {{{temp_list_us}}}")
         else:
             # Dodgy node number
             pass
