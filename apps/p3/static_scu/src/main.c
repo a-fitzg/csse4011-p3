@@ -15,6 +15,7 @@
 #include <sys/printk.h>
 #include <device.h>
 #include <devicetree.h>
+#include <drivers/uart.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -37,6 +38,10 @@ void main(void) {
     uint8_t unparsed_msg[SPI_BUFFER];
     struct UsPacket u_sensor;
     uint8_t* parsed_msg;
+
+    device_get_binding(CONFIG_UART_CONSOLE_ON_DEV_NAME);
+    usb_enable(NULL);
+
 
     while(1) {
 
@@ -63,6 +68,7 @@ void main(void) {
             // Send reading over HAL
             hal_parse_spi(6, pulse_reading, 2);
 
+            printk("VALUE: %d\n", pulse_reading);
         }
     }
 }

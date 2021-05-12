@@ -186,7 +186,10 @@ void bt_mobileCallback(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
         NodeQueueItem nodeQueueItem;
         nodeQueueItem.index = 4;
         nodeQueueItem.rssi = rssi;
+        payload[0] = 0;
+        payload[1] = buf->data[PAYLOAD_BUFFER_OFFSET - 1];
         memcpy(&nodeQueueItem.payload, &payload, sizeof(payload));
+        
 
         // Send off message to listening thread
         while (k_msgq_put(&os_QueueBtNodeMessage, &nodeQueueItem, K_NO_WAIT) 
@@ -210,6 +213,8 @@ void bt_mobileCallback(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
         NodeQueueItem nodeQueueItem;
         nodeQueueItem.index = 5;
         nodeQueueItem.rssi = rssi;
+        payload[0] = 0;
+        payload[1] = buf->data[PAYLOAD_BUFFER_OFFSET - 1];
         memcpy(&nodeQueueItem.payload, &payload, sizeof(payload));
 
         // Send off message to listening thread
@@ -234,6 +239,8 @@ void bt_mobileCallback(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
         NodeQueueItem nodeQueueItem;
         nodeQueueItem.index = 6;
         nodeQueueItem.rssi = rssi;
+        payload[0] = 0;
+        payload[1] = buf->data[PAYLOAD_BUFFER_OFFSET - 1];
         memcpy(&nodeQueueItem.payload, &payload, sizeof(payload));
 
         // Send off message to listening thread
@@ -258,6 +265,8 @@ void bt_mobileCallback(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
         NodeQueueItem nodeQueueItem;
         nodeQueueItem.index = 7;
         nodeQueueItem.rssi = rssi;
+        payload[0] = 0;
+        payload[1] = buf->data[PAYLOAD_BUFFER_OFFSET - 1];
         memcpy(&nodeQueueItem.payload, &payload, sizeof(payload));
 
         // Send off message to listening thread
