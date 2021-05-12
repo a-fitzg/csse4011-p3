@@ -138,5 +138,5 @@ if __name__ == "__main__":
         else:
             # Dodgy node number
             pass
-        sendData(rssi_list_primary, rssi_list_secondary, us_list)
+        sendData(rssi_list_primary, rssi_list_secondary, temp_list_us, temp_list_us)
         time.sleep(0.05)
