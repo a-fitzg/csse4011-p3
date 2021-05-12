@@ -8,6 +8,7 @@ rssi_list_secondary = list()
 us_list_primary = list()
 us_list_secondary = list()
 
+temp_list_us = []
 
 
 def sendData(rssi_primary, rssi_secondary,us1, us2):
@@ -123,7 +124,8 @@ if __name__ == "__main__":
         if len(data_tokens) != 17:
             continue
         temp_list_rssi = [int(i) for i in data_tokens[0:8]]
-        temp_list_us = [int(i) for i in data_tokens[8:16]]
+        if data_tokens[-1] == 0:
+            temp_list_us = [int(i) for i in data_tokens[8:16]]
         if int(data_tokens[-1]) == 0 or int(data_tokens[-1]) == 1:
             if int(data_tokens[-1]) == 0:
                 # Primary node
